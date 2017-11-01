@@ -121,5 +121,13 @@ shinyServer(function(input, output) {
     k
   })
   
+  output$Q1 <- renderText({
+    k <- round(x()[max(which(is.na(x()[,3]))) + 4,3],2)
+    if(input$unit_y == "YoY"){
+      k <- paste0(k,"%")
+    }
+    k
+  })
+  
   
 })

@@ -1,5 +1,7 @@
 shinyUI(
-  navbarPage(div("Nowcasting", style = "color:white; font-weight:bold; font-family:helvetica"), theme = shinytheme("yeti"), inverse = T,
+  navbarPage("Nowcasting", theme = "shiny.css", inverse = T,
+             
+               
              # PACKAGE ------------------------------------------------
              tabPanel("Package", 
                       wellPanel(style = "background-color:white",
@@ -46,7 +48,8 @@ shinyUI(
                                                    column(3, radioButtons(inputId = "unit_y", label = "Unit:", choices = c("Level","YoY"), selected = "YoY"),
                                                           div(textOutput("legenda_graph6"), style = "font-size:80%;"), br(),
                                                           conditionalPanel("input.now_button != 0",
-                                                          div("Q3:", textOutput("Q3", inline = T), br(), "Q4:",textOutput("Q4", inline = T), style = "background-color:#F0F8FF; height:70px; margin-top:5px; padding-top:15px; padding-left:10px; font-family:lucida console; font-size:90%;border-radius:5px")
+                                                          div("Q3/2017:", textOutput("Q3", inline = T), br(), "Q4/2017:",textOutput("Q4", inline = T), 
+                                                              br(), "Q1/2018:",textOutput("Q1", inline = T), style = "background-color:#F0F8FF; width:140px;height:85px; margin-top:5px; padding-top:15px; padding-left:10px; font-family:lucida console; font-size:90%;border-radius:5px")
                                                           )
                                                    ),
                                                    column(9,
