@@ -12,9 +12,9 @@ shinyUI(
                                   
                                   br(), br(),
                                   div(icon("angle-right"), "Github", style = "font-weight:bold"),
-                                  a(href = "https://github.com/guilbran/nowcasting", "https://github.com/guilbran/nowcasting", target = "_blank"),
-                                  div("devtools::install_github('guilbran/nowcasting')", style = "background-color:#F0F8FF; height:45px; margin-top:5px; padding-top:15px; padding-left:15px; font-family:lucida console; font-size:90%;border-radius:5px")
-                                
+                                  a(href = "https://github.com/nmecsys/nowcasting", "https://github.com/nmecsys/nowcasting", target = "_blank"),
+                                  div("devtools::install_github('nmecsys/nowcasting')", style = "background-color:#F0F8FF; height:45px; margin-top:5px; padding-top:15px; padding-left:15px; font-family:lucida console; font-size:90%;border-radius:5px")
+                                  
                                 )
                       )
              ),
@@ -29,9 +29,9 @@ shinyUI(
                                  sidebarPanel(width = 4, div("Nowcasting Brazilian GDP", style = "text-align:center"), hr(),
                                               
                                               uiOutput("series_available"),
-                                              sliderInput(inputId = "number_factors", label = "Number of factors:", min = 1, max = 5, value = 1),
-                                              sliderInput(inputId = "number_shocks", label = "Number of common shocks:", min = 1, max = 5, value = 1),
-                                              sliderInput(inputId = "number_lag", label = "Factor lag:", min = 1, max = 5, value = 1),
+                                              sliderInput(inputId = "number_factors", label = "Number of factors:", min = 1, max = 5, value = 2),
+                                              sliderInput(inputId = "number_shocks", label = "Number of common shocks:", min = 1, max = 5, value = 2),
+                                              sliderInput(inputId = "number_lag", label = "Factor lag:", min = 1, max = 5, value = 2),
                                               
                                               
                                               div(bsButton(inputId = "now_button", label = "Nowcast!", style = "primary" ), style = "text-align:center")
@@ -42,12 +42,17 @@ shinyUI(
                                    
                                    wellPanel(style = "background-color:white",
                                              div(style = "height:400px",
-                                                 
                                                  fluidRow(
-                                                   column(2, radioButtons(inputId = "unit_y", label = "Unit:", choices = c("Level","YoY")),
-                                                          div(textOutput("legenda_graph6"), style = "font-size:80%;")),
-                                                   column(10,
-                                                          
+                                                   column(3, radioButtons(inputId = "unit_y", label = "Unit:", choices = c("Level","YoY"), selected = "YoY"),
+                                                          div(textOutput("legenda_graph6"), style = "font-size:80%;"), br(),
+                                                          conditionalPanel("input.now_button != 0",
+                                                          div("Q3:", textOutput("Q3", inline = T), br(), "Q4:",textOutput("Q4", inline = T), style = "background-color:#F0F8FF; height:70px; margin-top:5px; padding-top:15px; padding-left:10px; font-family:lucida console; font-size:90%;border-radius:5px")
+                                                          )
+                                                   ),
+                                                   column(9,
+                                                          conditionalPanel("input.now_button != 0",
+                                                                           div(textOutput("title_graph6"), style = "text-align:center; font-size: 95%")
+                                                          ),br(),
                                                           dygraphOutput("graph6", width = "100%"))
                                                  )
                                              )

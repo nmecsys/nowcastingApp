@@ -53,8 +53,8 @@ shinyServer(function(input, output) {
       nowcast.plot(now(), type = "month_y")
   })
   
-  # graph 6 - pib yoy
-  output$graph6 <- renderDygraph({
+  # pib level and yoy
+  x <- reactive({
     if(input$now_button != 0){
       
       pib <- lag(data_series_available[,"serie22099"],-2)
@@ -79,15 +79,46 @@ shinyServer(function(input, output) {
         x <- cbind(varpibq, varfit, varprev)
       }
       colnames(x) <- c("y", "fit","fcst")
-      
-      dygraph(x) %>%
+      x
+    }
+  })
+  
+  # graph 6 - pib yoy
+  output$graph6 <- renderDygraph({
+    if(input$now_button != 0){
+      dygraph(x()) %>%
         dySeries("y", strokePattern = "dotted", color = "#000000") %>%
         dySeries("fit", strokeWidth = 2, color = "#3299CC") %>%
         dySeries("fcst", strokeWidth = 2, color = "#3299CC", strokePattern = "dashed") %>%
         dyAxis("y", axisLabelWidth = 20) %>%
-        dyRangeSelector(dateWindow = c(tail(as.Date(x),1) - years(5),tail(as.Date(x),1)), strokeColor = "#3299CC", fillColor = "#F0F8FF") %>%
+        dyRangeSelector(dateWindow = c(tail(as.Date(x()),1) - years(12),tail(as.Date(x()),1)), strokeColor = "#3299CC", fillColor = "#F0F8FF") %>%
         dyLegend(labelsDiv = "legenda_graph6", show = "always", labelsSeparateLines = T)
     }
+  })
+  
+  output$title_graph6 <- renderText({
+    if(input$unit_y == "Level"){
+      "Brazilian GDP (Level)"
+    }else{
+      "Brazilian GDP (Year over year)"
+    }
+  })
+  
+  # text Q3 and Q4
+  output$Q3 <- renderText({
+    k <- round(x()[max(which(is.na(x()[,3]))) + 2,3],2)
+    if(input$unit_y == "YoY"){
+      k <- paste0(k,"%")
+    }
+    k
+  })
+  
+  output$Q4 <- renderText({
+    k <- round(x()[max(which(is.na(x()[,3]))) + 3,3],2)
+    if(input$unit_y == "YoY"){
+      k <- paste0(k,"%")
+    }
+    k
   })
   
   
