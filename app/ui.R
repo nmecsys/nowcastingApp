@@ -87,6 +87,31 @@ shinyUI(
                         )
                       )
              ), # tabPanel Just do it!
+             
+             
+             # VINTAGE ----------------------------------------------
+             tabPanel("Vintage",
+                      
+                      wellPanel(style = "background-color:white",
+                                div("Collecting information available now", style = "font-weight:bold"),br(),
+                                
+                                "You can create real time data base from series available in", a(hreg = "https://www3.bcb.gov.br/sgspub/","Brazilian Central Bank Time Series Management System v2.1.", target = "_blank"), br(),
+                                span("Warning:", style = "background-color:#FFE4E1; height:15px; padding-bottom:5px; padding-top:5px; padding-left:5px; font-family:lucida console; font-size:90%;border-radius:5px"), 
+                                "We take no responsibility for delays in disclosure of new information or malfunctioning of the central bank platform.",
+                                br(),br(),
+                                
+                                "Example",
+                                div(style = "background-color:#F0F8FF; margin-top:5px; padding-top:15px; padding-bottom:15px; padding-left:15px; font-family:lucida console; font-size:90%;border-radius:5px",
+                                    "> ipca <- base_extraction(series_code = 433)", br(),
+                                    "> window(ipca, start = c(2016,1), end = c(2016,12), frequency = 12)"
+                                ),br(),
+                                img(src = "ipca.PNG")
+                                
+                                
+                                    
+                      )
+             ), # tabPanel Vintages
+             
              # AUTHORS ---------------------------------------------
              tabPanel("Authors", 
                       wellPanel(style = "background-color:white",
