@@ -2,6 +2,51 @@ shinyUI(
   navbarPage("Nowcasting", theme = "shiny.css", inverse = T,
              
                
+             # Home ------------------------------------------------
+             tabPanel("Now", 
+                      div(textOutput('hoje'), style = "text-align:right; font-size:85%"),
+                      fluidRow(
+                        column(2, offset = 3,
+                               wellPanel(style = "background-color:white;border-radius: 5px;",
+                                         div(textOutput("tri_backcasting"), style = "text-align:center; font-size:85%"),
+                                         div(tags$i("backcasting"), style = "text-align:center;font-size:80%"),
+                                         div(textOutput("fcst_back"), style = "text-align:center; font-weight:bold")
+                               )
+                        ),
+                        column(2, 
+                               wellPanel(style = "background-color:white;border-radius: 5px;",
+                                         div(textOutput("tri_nowcasting"), style = "text-align:center; font-size:85%"),
+                                         div("nowcasting", style = "text-align:center;font-size:80%"),
+                                         div(textOutput("fcst_now"), style = "text-align:center; font-weight:bold")
+                               )
+                        ),
+                        column(2, 
+                               wellPanel(style = "background-color:white;border-radius: 5px;",
+                                         div(textOutput("tri_forecasting"), style = "text-align:center; font-size:85%"),
+                                         div("forecasting", style = "text-align:center; font-size:80%"),
+                                         div(textOutput("fcst_fore"), style = "text-align:center;  font-weight:bold")
+                               )
+                        )
+                      ),
+                      
+                      wellPanel(style = "background-color:white",
+                                
+                                span("Backcasting, nowcasting and forecasting", style = "color:#858585; font-weight:bold; font-size:110%; font-family: 'Trebuchet MS'"),
+                                div("Year over year (%)", style = "color:#808080; font-size:90%; font-family: 'Trebuchet MS';"), br(), br(),
+                                plotlyOutput("grafico_completo_yoy", height = "250px"),
+                                hr(),
+                                
+                                span("Nowcasting evolution for the last quarter observed", style = "color:#858585; font-weight:bold; font-size:110%; font-family: 'Trebuchet MS'"),
+                                div("Year over year (%)", style = "color:#808080; font-size:90%; font-family: 'Trebuchet MS';"), br(),br(),
+                                plotlyOutput("grafico_historico_yoy", height = "250px"),
+                                hr(), 
+                                
+                                span("RMSE - Vintages", style = "color:#858585; font-weight:bold; font-size:110%; font-family: 'Trebuchet MS'"),
+                                div("Root Mean Square Error of the vintages (from Q1-2011)", style = "color:#808080; font-size:90%; font-family: 'Trebuchet MS';"), br(),br(),
+                                plotlyOutput("grafico_MSFE", height = "250px")
+                      )
+             ),
+             
              # PACKAGE ------------------------------------------------
              tabPanel("Package", 
                       wellPanel(style = "background-color:white",
@@ -123,16 +168,16 @@ shinyUI(
                                     a(href = "http://lattes.cnpq.br/2228133411590933","lattes", target = "_blank", style = "color:#3299CC"),
                                     br(),br(),
                                     
-                                    icon("angle-right"), "Daiane Marcolino de Mattos", br(),
-                                    "Graduate student in Electrical Engineering - Methods of Decision Support (PUC-Rio) and major in Statistical Science (ENCE/IBGE).", br(),
-                                    a(href = "mailto:daiane.mattos@fgv.br","email", title = "daiane.mattos@fgv.br", style ="color:#3299CC"), "|",
-                                    a(href = "http://lattes.cnpq.br/5903694854336540","lattes", target = "_blank", style = "color:#3299CC"),
-                                    br(),br(),
-                                    
                                     icon("angle-right"),"Guilherme Branco Gomes", br(),
                                     "Graduate student in Economics (FGV EPGE) and major in Economics (FEA/USP)", br(),
                                     a(href = "mailto:guilherme.branco@fgv.br","email", title = "guilherme.branco@fgv.br", style ="color:#3299CC"), "|",
-                                    a(href = "http://lattes.cnpq.br/4872383719355805","lattes", target = "_blank", style = "color:#3299CC")
+                                    a(href = "http://lattes.cnpq.br/4872383719355805","lattes", target = "_blank", style = "color:#3299CC"),
+                                    br(),br(),
+                                    
+                                    icon("angle-right"), "Daiane Marcolino de Mattos", br(),
+                                    "Graduate student in Electrical Engineering - Methods of Decision Support (PUC-Rio) and major in Statistical Science (ENCE/IBGE).", br(),
+                                    a(href = "mailto:daiane.mattos@fgv.br","email", title = "daiane.mattos@fgv.br", style ="color:#3299CC"), "|",
+                                    a(href = "http://lattes.cnpq.br/5903694854336540","lattes", target = "_blank", style = "color:#3299CC")
                                     
                                     
                                 )

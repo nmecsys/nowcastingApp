@@ -1,5 +1,99 @@
 shinyServer(function(input, output) {
   
+  
+  # Homepage ------------------------------------------------------------
+  
+  output$hoje <- renderText({paste('Atualizado em',hoje)})
+  output$tri_nowcasting <- renderText({tri_nowcasting_yoy})
+  output$tri_backcasting <- renderText({tri_backcasting_yoy})
+  output$tri_forecasting <- renderText({tri_forecasting_yoy})
+
+  output$fcst_back <- renderText({
+    paste0(as.vector(tail(na.omit(backcasting_yoy),1)),"%")
+  })
+  
+  output$fcst_now <- renderText({
+    paste0(as.vector(tail(nowcasting_yoy,1)),"%")
+  })
+  
+  output$fcst_fore <- renderText({
+    paste0(as.vector(tail(forecasting_yoy,1)),"%")
+  })
+
+  
+  output$grafico_MSFE <- renderPlotly({
+    plot_ly(y = round(RMSE,2), x = 1:length(RMSE), type = "bar", hoverinfo = "y",
+            marker = list(line = list(width = 0.5, color = "#50729F"), color = "#50729F")) %>%
+      layout(yaxis = list(range = c(0, max(RMSE) + 0.1), zeroline = T, zerolinecolor = "black", zerolinewidth = 1, title = "RMSE"),
+             xaxis = list(title = "Vintages"),
+             margin = list(b = 40, l = 40, r = 15, t = 0),
+             font = list(size = 10)) %>%
+      config(displayModeBar = F)
+
+  })
+
+  output$grafico_completo_yoy <- renderPlotly({
+    plot_ly(y = as.vector(backcasting_yoy), x = index(backcasting_yoy), type = "scatter", mode = "lines", hoverinfo = "y + x", line = list(color = "#5E2D79", width = 1.5), name = tri_backcasting_yoy) %>%
+      add_trace(y = as.vector(nowcasting_yoy), x = index(nowcasting_yoy), type = "scatter", mode = "lines", hoverinfo = "y + x", line = list(color = "#50729F", width = 1.5), name = tri_nowcasting_yoy) %>%
+      add_trace(y = as.vector(forecasting_yoy), x = index(forecasting_yoy), type = "scatter", mode = "lines", hoverinfo = "y + x",  line = list(color = "#F2473F", width = 1.5), name = tri_forecasting_yoy) %>% #marker = list(color = "#FF7D40"),
+      layout(yaxis = list(range = c(min(nowcasting_yoy, forecasting_yoy,backcasting_yoy, na.rm = T)-0.1, max(nowcasting_yoy,forecasting_yoy,backcasting_yoy, na.rm = T) + 0.1), zeroline = F, title = "PIB (%)"),
+             margin = list(b = 15, l = 40, r = 15, t = 0),
+             font = list(size = 10),
+             shapes = list(
+               list(type = "rect",
+                    fillcolor = c("#5E2D79"), line = list(color = c("#5E2D79")), opacity = 0.1,
+                    x0 = data_quadrado_back_yoy, x1 = data_quadrado_now_yoy, xref = "x",
+                    y0 = c(min(backcasting_yoy,nowcasting_yoy,forecasting_yoy, na.rm = T)-0.1), y1 = c(max(backcasting_yoy,nowcasting_yoy,forecasting_yoy, na.rm = T)+0.1), yref = "y"),
+               list(type = "rect",
+                    fillcolor = c("#50729F"), line = list(color = c("#50729F")), opacity = 0.1,
+                    x0 = data_quadrado_now_yoy, x1 = data_quadrado_fore_yoy, xref = "x",
+                    y0 = c(min(backcasting_yoy,nowcasting_yoy,forecasting_yoy, na.rm = T)-0.1), y1 = c(max(backcasting_yoy,nowcasting_yoy,forecasting_yoy, na.rm = T)+0.1), yref = "y"),
+               list(type = "rect",
+                    fillcolor = c("#A02422"), line = list(color = c("#F2473F")), opacity = 0.1,
+                    x0 = data_quadrado_fore_yoy, x1 = data_quadrado_fore_yoy+90, xref = "x",
+                    y0 = c(min(backcasting_yoy,nowcasting_yoy,forecasting_yoy, na.rm = T)-0.1), y1 = c(max(backcasting_yoy,nowcasting_yoy,forecasting_yoy, na.rm = T)+0.1), yref = "y")),
+             annotations = list(x = c(data_quadrado_back_yoy,data_quadrado_now_yoy, data_quadrado_fore_yoy)+45,
+                                y = max(backcasting_yoy,nowcasting_yoy,forecasting_yoy,na.rm=T),
+                                text = c(tri_backcasting_yoy,tri_nowcasting_yoy,tri_forecasting_yoy),  showarrow = F,
+                                xanchor = 'center', yanchor = 'top', font = list(color = "#A3A3A3", size = 10)))  %>%
+      config(displayModeBar = F)
+
+  })
+
+  output$grafico_historico_yoy <- renderPlotly({
+    plot_ly(y = round(datashiny$lasgdp[,1],2), x = rownames(datashiny$lasgdp), type = "scatter", mode = "lines", hoverinfo = "y + x", line = list(color = "#5E2D79", width = 1.5), name = "Previsão", showlegend = F) %>%
+      add_trace(y = round(datashiny$lasgdp[,2],2), x = rownames(datashiny$lasgdp), type = "scatter", mode = "lines", hoverinfo = "y + x", line = list(color = "red", width = 1.5), name = "PIB Observado") %>%
+      layout(yaxis = list(zeroline = F, title = "PIB (%)"),
+             margin = list(b = 75, l = 40, r = 15, t = 10),
+             font = list(size = 10)) %>%
+      config(displayModeBar = F)
+  })
+  
+  
+  # como interpretar os gráficos
+  
+  # observeEvent(input$question_now, {
+  #   showModal(modalDialog(
+  #     fluidRow(
+  #       column(5, img(src = "pibnow_explicar.png", width = "100%")),
+  #       column(7, div(style = "text-align:justify", "Os três gráficos em ", span("1", style = "font-weight:bold; color:#3299CC"), "apresentam a previsão do PIB para três trimestres: o atual, o anterior e o posterior.",
+  #                     "A área hachurada (azul, verde e laranja) representam o período do", tags$b("Nowcasting,"),"isto é, a previsão do trimestre quando se está no trimestre.",
+  #                     "A área em branco anterior à área hachurada representa o", tags$b("Forecasting"), "(previsão do trimestre antes de estar no trimestre).",
+  #                     "E, por último, a área em branco posterior representa o", tags$b("Backcasting"), "(previsão do trimestre após o trimestre ter passado).", br(), br(),
+  #                     "O gráfico em ", span("2", style = "font-weight:bold; color:#3299CC"), " apresenta uma medida de erro (Root Mean Square Erro - RMSE) para as previsões de acordo com cada vintage.",
+  #                     "São 34 vintages, isto é, cada trimestre é previsto 34 vezes. Espera-se que assim que as informações necessárias para as previsões sejam divulgadas, os erros diminuam, e por isso, ",
+  #                     "o erro da vintage 34 seja o menor de todos.", br(), br(),
+  #                     "O gráfico em ", span("3", style = "font-weight:bold; color:#3299CC"), " é a união dos três gráficos em ", span("1.", style = "font-weight:bold; color:#3299CC"),
+  #                     "Nele é possível comparar o avanço das previsões simultaneamente e verificar como a chegada de novas informações afeta a previsão dos três trimestres previstos.")
+  #       )
+  #     ),
+  #     title = "Como interpretar cada gráfico?",
+  #     easyClose = TRUE, footer = modalButton("Fechar"), size = "l"
+  #   ))
+  # })
+  
+  
+  # Just do it! ---------------------------------------------------------------------------------------
   # list of time series available
   output$series_available <- renderUI({
     selectInput(inputId = "series_available", label = "Time series available:", 
